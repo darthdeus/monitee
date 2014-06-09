@@ -1,0 +1,24 @@
+Default: &defaults
+  user: darth
+  password: ""
+  host: localhost
+  port: 5432
+  database: monitee_development
+  poolsize: 10
+
+Development:
+  <<: *defaults
+
+Testing:
+  database: monitee_test
+  <<: *defaults
+
+Staging:
+  database: monitee_staging
+  poolsize: 100
+  <<: *defaults
+
+Production:
+  database: monitee_production
+  poolsize: 100
+  <<: *defaults

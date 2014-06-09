@@ -1,0 +1,6 @@
+<h1>These are your processes
+
+<ul>
+  $forall Entity _ process <- processes
+    <li>#{processName process}
+
