@@ -19,5 +19,5 @@ import Data.Time (UTCTime)
 -- at:
 -- http://www.yesodweb.com/book/persistent/
 -- share [mkPersist sqlOnlySettings, mkMigrate "migrateAll"]
-share [mkPersist sqlSettings, mkMigrate "migrateAll"]
+share [mkPersist sqlSettings { mpsGenerateLenses = True }, mkMigrate "migrateAll"]
     $(persistFileWith lowerCaseSettings "config/models")

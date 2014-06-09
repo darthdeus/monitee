@@ -2,5 +2,5 @@
 
 <ul>
   $forall Entity _ process <- processes
-    <li>#{processName process}
+    <li>#{process ^. processName}
 
