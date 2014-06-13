@@ -1,6 +1,10 @@
 <h1>These are your processes
 
-<ul>
-  $forall Entity _ process <- processes
-    <li>#{process ^. processName}
+<form method="post" action=@{ProcessesR} enctype=#{enctype}>
+  ^{form}
+  <button .btn.btn-primary type="submit">Create process
 
+<ul>
+  $forall Entity id process <- processes
+    <li>
+      <a href=@{ProcessR id}> #{process ^. processName}

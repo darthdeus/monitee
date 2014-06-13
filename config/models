@@ -9,9 +9,12 @@ Email
     verkey Text Maybe
     UniqueEmail email
     deriving Show Eq
+
 Process
     name Text
+--    publicId UUID
     deriving Show Eq
+
 Report
     time UTCTime
     process ProcessId

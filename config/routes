@@ -5,4 +5,7 @@
 /robots.txt RobotsR GET
 
 / HomeR GET POST
-/processes ProcessesR GET
+/processes ProcessesR GET POST
+/processes/#ProcessId ProcessR GET
+
+/reports ReportsR GET POST
