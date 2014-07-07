@@ -21,6 +21,7 @@ library
                      Settings.Development
                      Handler.Home
                      Handler.Processes
+                     Helpers
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT
@@ -75,6 +76,7 @@ library
                  , foreign-store
                  , blaze-markup                  == 0.6.1.0
                  , old-locale                    == 1.0.0.6
+                 , esqueleto                     == 1.4.1.2
 
 executable         monitee
     if flag(library-only)

@@ -5,7 +5,7 @@ module Application
     , makeFoundation
     ) where
 
-import Network.Wai.Handler.Warp (runSettings, defaultSettings, setPort)
+-- import Network.Wai.Handler.Warp (runSettings, defaultSettings, setPort)
 import Import
 import Settings
 import Yesod.Auth
@@ -26,7 +26,8 @@ import Network.Wai.Logger (clockDateCacher)
 import Data.Default (def)
 import Yesod.Core.Types (loggerSet, Logger (Logger))
 
-import Database.Persist.Postgresql (withPostgresqlPool, runSqlPersistMPool)
+-- import Database.Persist.Postgresql (withPostgresqlPool, runSqlPersistMPool)
+
 -- Import all relevant handler modules here.
 -- Don't forget to add new modules to your cabal file!
 import Handler.Home
@@ -94,15 +95,15 @@ makeFoundation conf = do
 
     return foundation
 
-devRun :: IO ()
-devRun = getApplicationDev >>= \(port, app) -> runSettings (setPort port defaultSettings) app
+-- devRun :: IO ()
+-- devRun = getApplicationDev >>= \(port, app) -> runSettings (setPort port defaultSettings) app
 
-connString = "host=localhost dbname=monitee user=darth password= port=5432"
+-- connString = "host=localhost dbname=monitee user=darth password= port=5432"
 
-runDevDB action = withPostgresqlPool connString 2 (runSqlPersistMPool action)
+-- runDevDB action = withPostgresqlPool connString 2 (runSqlPersistMPool action)
 
-devSettings :: IO (AppConfig DefaultEnv ())
-devSettings = Yesod.Default.Config.loadConfig (configSettings Development)
+-- devSettings :: IO (AppConfig DefaultEnv ())
+-- devSettings = Yesod.Default.Config.loadConfig (configSettings Development)
 
 -- for yesod devel
 getApplicationDev :: IO (Int, Application)

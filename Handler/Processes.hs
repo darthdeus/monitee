@@ -4,7 +4,7 @@ import qualified Data.Text as T
 import           Data.Time hiding (parseTime)
 import           Database.Persist.Sql
 import           Import
-import           Text.Read hiding (lift)
+import Helpers
 
 utctimeField :: Field Handler UTCTime
 utctimeField = Field
@@ -18,46 +18,32 @@ parseUtcInput [] _         = return $ Right Nothing
 parseUtcInput [day,time] _ = return $ parseDayTime day time
 parseUtcInput _ _          = return $ Left "Invalid form submission. Both date and time are required."
 
-utctimeFieldView :: Text -> Text -> [(Text, Text)] -> Either Text UTCTime -> Bool -> WidgetT App IO ()
-utctimeFieldView idAttr name other result isRequired =
+utctimeFieldView :: Text -> Text -> [(Text, Text)] -> Either Text UTCTime -> Bool -> Widget
+utctimeFieldView idAttr name other _ isReq =
     [whamlet|
-       <input id="#{idAttr}" name="#{name}" *{other} isRequired:required type="date">
-       <input id="#{idAttr}" name="#{name}" *{other} isRequired:required type="text" placeholder="HH:MM">
+       <input id="#{idAttr}" name="#{name}" *{other} :isReq:required="" type="date">
+       <input id="#{idAttr}" name="#{name}" *{other} :isReq:required="" type="text" placeholder="HH:MM">
      |]
 
--- TODO - use form's parseDate
 parseDayTime :: Text -> Text -> Either (SomeMessage App) (Maybe UTCTime)
-parseDayTime dayText timeText = case (readMaybe $ T.unpack dayText :: Maybe Day) of
-    Nothing -> Left "invalid date format"
-    Just day -> case parseTime timeText of
+parseDayTime dayText timeText = case parseDate $ T.unpack dayText of
+    Left _ -> Left "invalid date format"
+    Right day -> case parseTime timeText of
         Left _ -> Left "invalid time format"
         Right time -> Right . Just $ UTCTime day (timeOfDayToTime time)
 
 processForm :: Html -> MForm Handler (FormResult Process, Widget)
 processForm = renderDivs $ Process <$> areq textField "Name" Nothing
 
-processIdField :: Field Handler ProcessId
-processIdField = undefined
-
 --processOptions :: Handler (OptionList (KeyBackend SqlBackend (ProcessGeneric SqlBackend)))
---processOptions :: Handler (OptionList (KeyBackend SqlBackend Process))
---processOptions = optionsPersist [] [Desc ProcessName] id
-
-reportForm :: Html ->  MForm Handler (FormResult Report, Widget)
-reportForm = renderDivs $ Report
-             <$> areq utctimeField "Time" Nothing
-            -- <$> (lift $ liftIO getCurrentTime)
-            -- <*> areq (selectField processOptions) "Process Id" Nothing
-             <*> areq (selectField pairs) "Process Id" Nothing
-             where pairs = do
-                       items <- runDB $ selectList [] []
-                       optionsPairs $ map (\p -> (entityVal p ^. processName, entityKey p)) items
+processOptions :: Handler (OptionList (KeyBackend SqlBackend Process))
+processOptions = optionsPersistKey [] [Desc ProcessName] (\x -> toMessage $ x ^. processName)
 
 getProcessesR :: Handler Html
 getProcessesR = do
     processes <- runDB $ selectList [] [Desc ProcessName]
 
-    (form, enctype) <- generateFormPost processForm
+    (form, _) <- generateFormPost processForm
     defaultLayout $(widgetFile "processes")
 
 postProcessesR :: Handler Html
@@ -67,7 +53,7 @@ postProcessesR = do
     case result of
         FormSuccess process -> do
             void . runDB $ insert process
-            setMessage "Process was addeds"
+            setMessage "Process was added"
             redirect ProcessesR
         _ -> do
             setMessage "Process name is required"
@@ -79,25 +65,38 @@ getProcessR processId = do
     return $ process ^. processName
 
 
+
+reportForm :: Html -> MForm Handler (FormResult Report, Widget)
+reportForm = renderDivs $ Report
+             <$> areq utctimeField "Time" Nothing
+             <*> areq (selectField processOptions) "Process Id" Nothing
+
 getReportsR :: Handler Html
 getReportsR = do
     (form, _) <- generateFormPost reportForm
-    reportsView form
+    defaultLayout $ reportsView form
 
 postReportsR :: Handler Html
 postReportsR = do
     ((result, form), _) <- runFormPost reportForm
 
     case result of
-        FormSuccess _ -> do
-            setMessage "Result was created"
+        FormSuccess report -> do
+            void . runDB $ insert report
+            setMessage "Report was created"
             redirect ReportsR
 
-        _ -> reportsView form
+        _ -> defaultLayout $ reportsView form
 
 -- Simple helper for rendering reports form
-reportsView form =
-    defaultLayout [whamlet|
-                   <form action=@{ReportsR} method="post">
-                                                   ^{form}
-                          |]
+reportsView :: Widget -> Widget
+reportsView form = do
+    items <- handlerToWidget $ runDB $ listReportProcess
+    [whamlet|
+     <h1>These are all the reports
+     <ul>
+        $forall (Entity _ report, Entity _ process) <- items
+            <li>#{show $ report ^. reportTime} #{show $ process ^. processName}
+
+     <form action=@{ReportsR} method="post">^{form}
+    |]

@@ -1,6 +1,6 @@
 <h1>These are your processes
 
-<form method="post" action=@{ProcessesR} enctype=#{enctype}>
+<form method="post" action=@{ProcessesR}>
   ^{form}
   <button .btn.btn-primary type="submit">Create process
 
