@@ -32,8 +32,10 @@ parseDayTime dayText timeText = case parseDate $ T.unpack dayText of
         Left _ -> Left "invalid time format"
         Right time -> Right . Just $ UTCTime day (timeOfDayToTime time)
 
-processForm :: Html -> MForm Handler (FormResult Process, Widget)
+processForm :: Form Process
 processForm = renderDivs $ Process <$> areq textField "Name" Nothing
+                                   <*> areq textField "URL" Nothing
+                                   <*> areq intField "Monitoring Frequency" (Just 60)
 
 --processOptions :: Handler (OptionList (KeyBackend SqlBackend (ProcessGeneric SqlBackend)))
 processOptions :: Handler (OptionList (KeyBackend SqlBackend Process))

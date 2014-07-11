@@ -12,7 +12,8 @@ Email
 
 Process
     name Text
---    publicId UUID
+    url Text
+    frequency Int
     deriving Show Eq
 
 Report

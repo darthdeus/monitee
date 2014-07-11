@@ -50,6 +50,21 @@ mkYesodData "App" $(parseRoutesFile "config/routes")
 
 type Form x = Html -> MForm (HandlerT App IO) (FormResult x, Widget)
 
+mainNavbar :: Widget
+mainNavbar = do
+    toWidget
+        [whamlet|
+         <div .navbar>
+           <div .navbar-inner>
+             <a .brand href=@{HomeR}>Monitee
+             <ul .nav>
+               <li .active>
+                 <a href=@{HomeR}>Home
+               <li>
+                 <a href=@{ProcessesR}>Processes
+
+         |]
+
 -- Please see the documentation for the Yesod typeclass. There are a number
 -- of settings which can be configured by overriding methods here.
 instance Yesod App where
@@ -70,6 +85,8 @@ instance Yesod App where
         -- default-layout-wrapper is the entire page. Since the final
         -- value passed to hamletToRepHtml cannot be a widget, this allows
         -- you to use normal widget features in default-layout.
+
+        topnav <- widgetToPageContent mainNavbar
 
         pc <- widgetToPageContent $ do
             $(combineStylesheets 'StaticR
@@ -121,7 +138,7 @@ instance YesodAuth App where
     type AuthId App = UserId
 
     -- Where to send a user after successful login
-    loginDest _ = HomeR
+    loginDest _ = ProcessesR
     -- Where to send a user after logout
     logoutDest _ = HomeR
 
