@@ -19,6 +19,7 @@ Process
 Report
     time UTCTime
     process ProcessId
+    status Bool
     deriving Show Eq
 
  -- By default this file is used in Model.hs (which is imported by Foundation.hs)

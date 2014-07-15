@@ -11,6 +11,7 @@ reportForm :: Html -> MForm Handler (FormResult Report, Widget)
 reportForm = renderDivs $ Report
              <$> areq utctimeField "Time" Nothing
              <*> areq (selectField processOptions) "Process Id" Nothing
+             <*> areq boolField "Available?" Nothing
 
 getReportsR :: Handler Html
 getReportsR = do
