@@ -2,6 +2,7 @@ module Handler.Processes where
 
 import Database.Persist.Sql
 import Import
+import Helpers
 
 processForm :: Form Process
 processForm = renderDivs $ Process <$> areq textField "Name" Nothing
@@ -28,7 +29,10 @@ postProcessesR = do
             setMessage "Process name is required"
             redirect ProcessesR
 
-getProcessR :: ProcessId -> Handler Text
+getProcessR :: ProcessId -> Handler Html
 getProcessR processId = do
+    (form, _) <- generateFormPost $ reportForm Nothing
     process <- runDB $ get404 processId
-    return $ process ^. processName
+
+    reports <- runDB $ selectList [ReportProcess ==. processId] [Desc ReportTime]
+    defaultLayout $(widgetFile "process")

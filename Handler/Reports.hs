@@ -1,26 +1,18 @@
 module Handler.Reports where
 
+import Debug.Trace
 import Database.Persist.Sql
 import Import
 import Helpers
 
-processOptions :: Handler (OptionList (KeyBackend SqlBackend Process))
-processOptions = optionsPersistKey [] [Desc ProcessName] (\x -> toMessage $ x ^. processName)
-
-reportForm :: Html -> MForm Handler (FormResult Report, Widget)
-reportForm = renderDivs $ Report
-             <$> areq utctimeField "Time" Nothing
-             <*> areq (selectField processOptions) "Process Id" Nothing
-             <*> areq boolField "Available?" Nothing
-
 getReportsR :: Handler Html
 getReportsR = do
-    (form, _) <- generateFormPost reportForm
+    (form, _) <- generateFormPost $ reportForm Nothing
     defaultLayout $ reportsView form
 
 postReportsR :: Handler Html
 postReportsR = do
-    ((result, form), _) <- runFormPost reportForm
+    ((result, form), _) <- runFormPost $ reportForm Nothing
 
     case result of
         FormSuccess report -> do
@@ -28,7 +20,8 @@ postReportsR = do
             setMessage "Report was created"
             redirect ReportsR
 
-        _ -> defaultLayout $ reportsView form
+        _ -> do
+            defaultLayout $ reportsView form
 
 -- Simple helper for rendering reports form
 reportsView :: Widget -> Widget

@@ -1,7 +1,7 @@
 module Helpers where
 
-import           Data.Time hiding (parseTime)
 import qualified Data.Text as T
+import           Data.Time hiding (parseTime)
 import           Database.Esqueleto
 import           Import hiding ((^.), from, (==.))
 
@@ -17,6 +17,7 @@ parseUtcInput [] _         = return $ Right Nothing
 parseUtcInput [day,time] _ = return $ parseDayTime day time
 parseUtcInput _ _          = return $ Left "Invalid form submission. Both date and time are required."
 
+-- TODO - use the value coming from the user
 utctimeFieldView :: Text -> Text -> [(Text, Text)] -> Either Text UTCTime -> Bool -> Widget
 utctimeFieldView idAttr name other _ isReq =
     [whamlet|
@@ -36,3 +37,12 @@ listReportProcess =
     select . from $ \(r, p) -> do
     where_ (r ^. ReportProcess ==. p ^. ProcessId)
     return (r, p)
+
+processOptions :: Handler (OptionList (KeyBackend SqlBackend Process))
+processOptions = optionsPersistKey [] [Desc ProcessName] (\x -> toMessage $ _processName x)
+
+reportForm :: Maybe Report -> Html -> MForm Handler (FormResult Report, Widget)
+reportForm report = renderDivs $ Report
+             <$> areq utctimeField "Time" (report ^? _Just.reportTime)
+             <*> areq (selectField processOptions) "Process Id" (report ^? _Just.reportProcess)
+             <*> areq boolField "Available?" (report ^? _Just.reportStatus)

@@ -1,0 +1,11 @@
+<h1>#{process ^. processName}
+
+<ul>
+  $forall Entity _ report <- reports
+    <li>#{show $ report ^. reportTime}
+
+<form action=@{ReportsR}>
+  ^{form}
+
+<p>
+  <a href=@{ProcessesR}>Back to all processes

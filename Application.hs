@@ -1,3 +1,4 @@
+{-# LANGUAGE RankNTypes #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Application
     ( makeApplication
@@ -7,6 +8,7 @@ module Application
 
 -- import Network.Wai.Handler.Warp (runSettings, defaultSettings, setPort)
 import Import
+import Data.Time
 import Settings
 import Yesod.Auth
 import Yesod.Default.Config
@@ -34,6 +36,8 @@ import Handler.Home
 import Handler.Processes
 import Handler.Reports
 
+import Monitor
+
 -- This line actually creates our YesodDispatch instance. It is the second half
 -- of the call to mkYesodData which occurs in Foundation.hs. Please see the
 -- comments there for more details.
@@ -55,6 +59,8 @@ makeApplication conf = do
                 else Apache FromSocket
         , destination = RequestLogger.Logger $ loggerSet $ appLogger foundation
         }
+
+    forkIO $ runMonitor foundation
 
     -- Create the WAI application and apply middlewares
     app <- toWaiAppPlain foundation
