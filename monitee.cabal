@@ -21,6 +21,7 @@ library
                      Settings.Development
                      Handler.Home
                      Handler.Processes
+                     Handler.Reports
                      Helpers
 
     if flag(dev) || flag(library-only)
