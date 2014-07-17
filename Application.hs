@@ -8,7 +8,6 @@ module Application
 
 -- import Network.Wai.Handler.Warp (runSettings, defaultSettings, setPort)
 import Import
-import Data.Time
 import Settings
 import Yesod.Auth
 import Yesod.Default.Config
@@ -60,7 +59,7 @@ makeApplication conf = do
         , destination = RequestLogger.Logger $ loggerSet $ appLogger foundation
         }
 
-    forkIO $ runMonitor foundation
+    void $ forkIO $ runMonitor foundation
 
     -- Create the WAI application and apply middlewares
     app <- toWaiAppPlain foundation
