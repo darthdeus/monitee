@@ -16,7 +16,7 @@ Process
     frequency Int
     deriving Show Eq
 
-Report
+Report json
     time UTCTime
     process ProcessId
     status Bool
