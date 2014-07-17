@@ -1,10 +1,14 @@
-<h1>These are your processes
-
-<form method="post" action=@{ProcessesR}>
-  ^{form}
-  <button .btn.btn-primary type="submit">Create process
+<h2>These are your processes
 
 <ul>
   $forall Entity id process <- processes
     <li>
       <a href=@{ProcessR id}> #{process ^. processName}
+
+<hr>
+
+<h3> Create a new process
+
+<form method="post" action=@{ProcessesR}>
+  ^{form}
+  <button .btn.btn-primary type="submit">Create process

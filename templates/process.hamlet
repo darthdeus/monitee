@@ -4,8 +4,10 @@
   $forall Entity _ report <- reports
     <li>#{show $ report ^. reportTime}
 
-<form action=@{ReportsR}>
+<form action=@{ProcessR processId} method="post">
   ^{form}
+
+  <button .btn.btn-primary type="submit">Update settings
 
 <p>
   <a href=@{ProcessesR}>Back to all processes

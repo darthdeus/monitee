@@ -7,6 +7,6 @@
 / HomeR GET
 
 /processes ProcessesR GET POST
-/processes/#ProcessId ProcessR GET
+/processes/#ProcessId ProcessR GET POST
 
 /reports ReportsR GET POST
