@@ -78,6 +78,8 @@ library
                  , blaze-markup                  == 0.6.1.0
                  , old-locale                    == 1.0.0.6
                  , esqueleto                     == 1.4.1.2
+                 , network                       >= 2.5.0.0 && < 2.6
+                 , wreq
 
 executable         monitee
     if flag(library-only)
