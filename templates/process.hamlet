@@ -2,7 +2,9 @@
 
 <ul>
   $forall Entity _ report <- reports
-    <li>#{show $ report ^. reportTime}
+    <li>
+      #{show $ report ^. reportTime}
+      #{show $ report ^. reportStatus}
 
 <form action=@{ProcessR processId} method="post">
   ^{form}
