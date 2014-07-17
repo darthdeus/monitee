@@ -1,3 +1,35 @@
 $(function() {
-    console.log(#{toJSON reports});
+    var data = #{toJSON reports};
+
+    var w = 500;
+    var h = 200;
+    var padding = 1;
+
+    var radius = 2;
+
+    var svg = d3.select(".chart")
+        .append("svg")
+        .attr("width", w)
+        .attr("height", h);
+
+    svg.selectAll("circle")
+        .data(data)
+        .enter()
+        .append("circle")
+        .attr("cx", function(d,i) {
+            return i + padding
+        })
+        .attr("cy", function(d,i){
+            var bool = data[i]["value"]["status"];
+            return getValue(bool);
+        })
+        .attr("r", radius);
+
+    function getValue(bool) {
+        if (bool == true) {
+            return 20;
+        } else {
+            return 80;
+        }
+    }
 });

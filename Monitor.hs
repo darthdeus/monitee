@@ -20,7 +20,8 @@ runMonitor app = do
             mapM_ checkAvailability processes
             return ()
 
-        threadDelay 60000000
+        threadDelay 100000000
+        putStrLn "looping"
         loop
 
     void loop

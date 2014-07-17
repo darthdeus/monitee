@@ -1,12 +1,9 @@
 module Handler.Processes where
 
 import Data.Aeson
-import qualified Data.Text.Lazy as TL
-import Data.Text.Lazy.Encoding
+import Data.Time
 import Database.Persist.Sql
-import Helpers
 import Import
-import Text.Julius
 import Prelude (head)
 
 processForm :: Maybe Process -> Form Process
@@ -39,9 +36,15 @@ getProcessR processId = do
     process <- runDB $ get404 processId
     (form, _) <- generateFormPost $ processForm $ Just process
 
-    reports <- runDB $ selectList [ReportProcess ==. processId] [Desc ReportTime, LimitTo 10]
+    reports <- runDB $ selectList [ReportProcess ==. processId] [Desc ReportTime, LimitTo 10000]
+
+    let availability = neco reports
 
     defaultLayout $(widgetFile "process")
+
+neco :: [Entity Report] -> [(UTCTime, Bool)]
+neco entities = map (\report -> (report ^. reportTime, report ^. reportStatus)) reports
+    where reports = map entityVal entities
 
 postProcessR :: ProcessId -> Handler Html
 postProcessR processId = do
