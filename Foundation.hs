@@ -8,6 +8,7 @@ import Yesod.Auth.BrowserId
 import Yesod.Auth.GoogleEmail
 import Yesod.Default.Config
 import Yesod.Default.Util (addStaticContentExternal)
+import Yesod.Form.Jquery
 import Network.HTTP.Client.Conduit (Manager, HasHttpManager (getHttpManager))
 import qualified Settings
 import Settings.Development (development)
@@ -62,6 +63,8 @@ mainNavbar = do
                  <a href=@{HomeR}>Home
                <li>
                  <a href=@{ProcessesR}>Processes
+               <li>
+                 <a href=@{DashboardR}>Dashboard
 
          |]
 

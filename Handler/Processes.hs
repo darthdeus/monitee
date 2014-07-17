@@ -5,6 +5,7 @@ import           Data.Time hiding (parseTime)
 import           Database.Persist.Sql
 import           Import
 import Helpers
+import Prelude (head)
 
 utctimeField :: Field Handler UTCTime
 utctimeField = Field
@@ -102,3 +103,8 @@ reportsView form = do
 
      <form action=@{ReportsR} method="post">^{form}
     |]
+
+getDashboardR :: Handler Html
+getDashboardR = do
+   processes <- runDB $ selectList [] [Desc ProcessName]
+   defaultLayout $(widgetFile "dashboard")
