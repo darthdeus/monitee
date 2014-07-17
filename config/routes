@@ -10,3 +10,5 @@
 /processes/#ProcessId ProcessR GET POST
 
 /reports ReportsR GET POST
+
+/dashboard DashboardR GET

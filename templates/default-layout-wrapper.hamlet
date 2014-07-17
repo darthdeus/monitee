@@ -13,6 +13,8 @@ $newline never
         <meta name="author" content="">
 
         <meta name="viewport" content="width=device-width,initial-scale=1">
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 
         ^{pageHead pc}
 

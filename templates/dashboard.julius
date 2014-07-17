@@ -1,0 +1,51 @@
+var data = JSON.parse("[{\"timestamp\":1405176946,\"available\":true},{\"timestamp\":1405176947,\"available\":false},{\"timestamp\":1405176948,\"available\":true},{\"timestamp\":1405176949,\"available\":true},{\"timestamp\":1405176950,\"available\":true},{\"timestamp\":1405176951,\"available\":true},{\"timestamp\":1405176952,\"available\":true},{\"timestamp\":1405176953,\"available\":true},{\"timestamp\":1405176954,\"available\":true},{\"timestamp\":1405176955,\"available\":false},{\"timestamp\":1405176956,\"available\":true},{\"timestamp\":1405176957,\"available\":false},{\"timestamp\":1405176958,\"available\":true},{\"timestamp\":1405176959,\"available\":true},{\"timestamp\":1405176960,\"available\":true},{\"timestamp\":1405176961,\"available\":false},{\"timestamp\":1405176962,\"available\":true},{\"timestamp\":1405176963,\"available\":true},{\"timestamp\":1405176964,\"available\":true},{\"timestamp\":1405176965,\"available\":false},{\"timestamp\":1405176966,\"available\":true},{\"timestamp\":1405176967,\"available\":true},{\"timestamp\":1405176968,\"available\":true},{\"timestamp\":1405176969,\"available\":true},{\"timestamp\":1405176970,\"available\":true},{\"timestamp\":1405176971,\"available\":true},{\"timestamp\":1405176972,\"available\":false},{\"timestamp\":1405176973,\"available\":true},{\"timestamp\":1405176974,\"available\":true},{\"timestamp\":1405176975,\"available\":true},{\"timestamp\":1405176976,\"available\":false},{\"timestamp\":1405176977,\"available\":true},{\"timestamp\":1405176978,\"available\":true},{\"timestamp\":1405176979,\"available\":true},{\"timestamp\":1405176980,\"available\":true},{\"timestamp\":1405176981,\"available\":false},{\"timestamp\":1405176982,\"available\":true},{\"timestamp\":1405176983,\"available\":false},{\"timestamp\":1405176984,\"available\":true},{\"timestamp\":1405176985,\"available\":false},{\"timestamp\":1405176986,\"available\":true},{\"timestamp\":1405176987,\"available\":true},{\"timestamp\":1405176988,\"available\":false},{\"timestamp\":1405176989,\"available\":true},{\"timestamp\":1405176990,\"available\":true},{\"timestamp\":1405176991,\"available\":true},{\"timestamp\":1405176992,\"available\":true},{\"timestamp\":1405176993,\"available\":true},{\"timestamp\":1405176994,\"available\":false},{\"timestamp\":1405176995,\"available\":true},{\"timestamp\":1405176996,\"available\":true},{\"timestamp\":1405176997,\"available\":true},{\"timestamp\":1405176998,\"available\":false},{\"timestamp\":1405176999,\"available\":false},{\"timestamp\":1405177000,\"available\":false},{\"timestamp\":1405177001,\"available\":true},{\"timestamp\":1405177002,\"available\":true},{\"timestamp\":1405177003,\"available\":true},{\"timestamp\":1405177004,\"available\":false},{\"timestamp\":1405177005,\"available\":true},{\"timestamp\":1405177006,\"available\":true},{\"timestamp\":1405177007,\"available\":true},{\"timestamp\":1405177008,\"available\":true},{\"timestamp\":1405177009,\"available\":true},{\"timestamp\":1405177010,\"available\":true},{\"timestamp\":1405177011,\"available\":true},{\"timestamp\":1405177012,\"available\":false},{\"timestamp\":1405177013,\"available\":true},{\"timestamp\":1405177014,\"available\":true},{\"timestamp\":1405177015,\"available\":true},{\"timestamp\":1405177016,\"available\":false},{\"timestamp\":1405177017,\"available\":true},{\"timestamp\":1405177018,\"available\":true},{\"timestamp\":1405177019,\"available\":true},{\"timestamp\":1405177020,\"available\":true},{\"timestamp\":1405177021,\"available\":true},{\"timestamp\":1405177022,\"available\":true},{\"timestamp\":1405177023,\"available\":true},{\"timestamp\":1405177024,\"available\":true},{\"timestamp\":1405177025,\"available\":false},{\"timestamp\":1405177026,\"available\":true},{\"timestamp\":1405177027,\"available\":true},{\"timestamp\":1405177028,\"available\":false},{\"timestamp\":1405177029,\"available\":true},{\"timestamp\":1405177030,\"available\":true},{\"timestamp\":1405177031,\"available\":true},{\"timestamp\":1405177032,\"available\":true},{\"timestamp\":1405177033,\"available\":true},{\"timestamp\":1405177034,\"available\":true},{\"timestamp\":1405177035,\"available\":true},{\"timestamp\":1405177036,\"available\":false},{\"timestamp\":1405177037,\"available\":false},{\"timestamp\":1405177038,\"available\":true},{\"timestamp\":1405177039,\"available\":true},{\"timestamp\":1405177040,\"available\":true},{\"timestamp\":1405177041,\"available\":true},{\"timestamp\":1405177042,\"available\":true},{\"timestamp\":1405177043,\"available\":true},{\"timestamp\":1405177044,\"available\":false},{\"timestamp\":1405177045,\"available\":false},{\"timestamp\":1405177046,\"available\":false}]");
+
+$(document).ready(function() {
+    console.log(data);
+
+    var w = 500;
+    var h = 200;
+    var padding = 1;
+
+    var svg = d3.select("body")
+        .append("svg")
+        .attr("width", w)
+        .attr("height", h);
+
+    svg.selectAll("circle")
+        .data(data)
+        .enter()
+        .append("circle")
+        .attr("cx", function(d,i) {
+            return 30 * i + padding
+        })
+        .attr("cy", function(d,i){
+            var bool = data[i]["available"];
+            return getValue(bool);
+        })
+        .attr("r", 10);
+
+    svg.selectAll("text")
+        .data(data)
+        .enter()
+        .append("text")
+        .text(function(d, i) {
+            return data[i]["available"].toString();
+        })
+        .attr("x", function(d, i) {
+            return 30 * i + padding
+        })
+        .attr("y", function(d, i) {
+            var bool = data[i]["available"];
+            return getValue(bool);
+        })
+        .attr("fill", "red");
+});
+
+function getValue(bool) {
+    if (bool == true) {
+        return 20;
+    } else {
+        return 80;
+    }
+}

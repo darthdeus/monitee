@@ -7,6 +7,7 @@ import Database.Persist.Sql
 import Helpers
 import Import
 import Text.Julius
+import Prelude (head)
 
 processForm :: Maybe Process -> Form Process
 processForm p = renderDivs $ Process <$> areq textField "Name" (p ^? _Just.processName)
@@ -56,3 +57,8 @@ postProcessR processId = do
         _ -> do
             setMessage "Invalid process"
             redirect $ ProcessR processId
+
+getDashboardR :: Handler Html
+getDashboardR = do
+   processes <- runDB $ selectList [] [Desc ProcessName]
+   defaultLayout $(widgetFile "dashboard")
