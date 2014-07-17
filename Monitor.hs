@@ -1,5 +1,7 @@
 module Monitor
        ( runMonitor
+       , withDB
+       , db
        ) where
 
 import Control.Concurrent
