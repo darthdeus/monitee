@@ -3,6 +3,7 @@
 module Application
     ( makeApplication
     , getApplicationDev
+    , getApplicationRepl
     , makeFoundation
     ) where
 
@@ -35,6 +36,8 @@ import Handler.Home
 import Handler.Processes
 import Handler.Reports
 
+import Debug.Trace
+
 import Monitor
 
 -- This line actually creates our YesodDispatch instance. It is the second half
@@ -42,12 +45,8 @@ import Monitor
 -- comments there for more details.
 mkYesodDispatch "App" resourcesApp
 
--- This function allocates resources (such as a database connection pool),
--- performs initialization and creates a WAI application. This is also the
--- place to put your migrate statements to have automatic database
--- migrations handled by Yesod.
-makeApplication :: AppConfig DefaultEnv Extra -> IO (Application, LogFunc)
-makeApplication conf = do
+makeApplicationFoundation :: AppConfig DefaultEnv Extra -> IO (App, Application, LogFunc)
+makeApplicationFoundation conf = do
     foundation <- makeFoundation conf
 
     -- Initialize the logging middleware
@@ -59,12 +58,19 @@ makeApplication conf = do
         , destination = RequestLogger.Logger $ loggerSet $ appLogger foundation
         }
 
-    void $ forkIO $ runMonitor foundation
-
     -- Create the WAI application and apply middlewares
     app <- toWaiAppPlain foundation
     let logFunc = messageLoggerSource foundation (appLogger foundation)
-    return (logWare $ defaultMiddlewaresNoLogging app, logFunc)
+    return (foundation, logWare $ defaultMiddlewaresNoLogging app, logFunc)
+
+-- This function allocates resources (such as a database connection pool),
+-- performs initialization and creates a WAI application. This is also the
+-- place to put your migrate statements to have automatic database
+-- migrations handled by Yesod.
+makeApplication :: AppConfig DefaultEnv Extra -> IO (Application, LogFunc)
+makeApplication conf = do
+    (_, app, l) <- makeApplicationFoundation conf
+    return (app, l)
 
 -- | Loads up any necessary settings, creates your foundation datatype, and
 -- performs some initialization.
@@ -76,6 +82,8 @@ makeFoundation conf = do
               Database.Persist.loadConfig >>=
               Database.Persist.applyEnv
     p <- Database.Persist.createPoolConfig (dbconf :: Settings.PersistConf)
+
+    monitorId <- forkIO $ runMonitor p
 
     loggerSet' <- newStdoutLoggerSet defaultBufSize
     (getter, updater) <- clockDateCacher
@@ -92,7 +100,7 @@ makeFoundation conf = do
     _ <- forkIO updateLoop
 
     let logger = Yesod.Core.Types.Logger loggerSet' getter
-        foundation = App conf s p manager dbconf logger
+        foundation = App conf s p manager dbconf logger monitorId
 
     -- Perform database migration using our application's logging settings.
     runLoggingT
@@ -119,3 +127,12 @@ getApplicationDev =
     loader = Yesod.Default.Config.loadConfig (configSettings Development)
         { csParseExtra = parseExtra
         }
+
+getApplicationRepl :: IO (Int, App, Application)
+getApplicationRepl = do
+    let loader = Yesod.Default.Config.loadConfig (configSettings Development) { csParseExtra = parseExtra}
+
+    conf <- loader
+    (site, app1, _) <- makeApplicationFoundation conf
+    (p, app2) <- defaultDevelApp (return conf) (const (return app1))
+    return (p, site, app2)

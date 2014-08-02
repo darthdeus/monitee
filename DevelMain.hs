@@ -2,8 +2,10 @@
 
 module DevelMain where
 
+import Control.Applicative
+import Data.Monoid
 import Prelude
-import Application (getApplicationDev)
+import Application (getApplicationRepl)
 
 import Control.Exception (finally)
 import Control.Concurrent
@@ -11,9 +13,51 @@ import Data.IORef
 import Foreign.Store
 import Network.Wai.Handler.Warp
 
--- | Start or restart the server.
+import Foundation
+import Debug.Trace
+
 update :: IO ()
 update = do
+    mtidStore <- lookupStore tidStoreNum
+    case mtidStore of
+      -- no server running
+      Nothing -> do
+          done <- storeAction doneStore newEmptyMVar
+          tid <- start done
+          _ <- storeAction (Store tidStoreNum) (newIORef tid)
+          return ()
+      -- server is already running
+      Just tidStore ->
+          -- shut the server down with killThread and wait for the done signal
+          modifyStoredIORef tidStore $ \tid -> do
+              trace ("killling " ++ show tid) $ killThread tid
+              withStore doneStore takeMVar >> readStore doneStore >>= start
+  where
+    doneStore = Store 0
+    tidStoreNum = 1
+
+    modifyStoredIORef :: Store (IORef a) -> (a -> IO a) -> IO ()
+    modifyStoredIORef store f = withStore store $ \ref -> do
+        v <- readIORef ref
+        f v >>= writeIORef ref
+
+-- | Start the server in a separate thread.
+start :: MVar () -- ^ Written to when the thread is killed.
+      -> IO ThreadId
+start done = do
+    (port,site,app) <- getApplicationRepl
+
+    let monitorId = monitorThread site
+
+    appTid <- forkIO (finally (runSettings (setPort port defaultSettings) app)
+                     (putMVar done () >> killThread (traceShow ("Killed a monitor thread " ++ show monitorId) monitorId)))
+
+    return appTid
+
+
+-- | Start or restart the server.
+update2 :: IO ()
+update2 = do
     mtidStore <- lookupStore tid_1
     case mtidStore of
       Nothing -> do
@@ -29,15 +73,8 @@ update = do
           done <- readStore (Store done_0)
           killThread tid
           takeMVar done
+
           newTid <- start done
           writeIORef tidRef newTid
   where tid_1 = 1
         done_0 = 0
-
--- | Start the server in a separate thread.
-start :: MVar () -- ^ Written to when the thread is killed.
-      -> IO ThreadId
-start done = do
-    (port,app) <- getApplicationDev
-    forkIO (finally (runSettings (setPort port defaultSettings) app)
-                    (putMVar done ()))

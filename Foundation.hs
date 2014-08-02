@@ -1,6 +1,7 @@
 module Foundation where
 
 import Prelude
+import Control.Concurrent
 import Yesod
 import Yesod.Static
 import Yesod.Auth
@@ -8,7 +9,6 @@ import Yesod.Auth.BrowserId
 import Yesod.Auth.GoogleEmail
 import Yesod.Default.Config
 import Yesod.Default.Util (addStaticContentExternal)
-import Yesod.Form.Jquery
 import Network.HTTP.Client.Conduit (Manager, HasHttpManager (getHttpManager))
 import qualified Settings
 import Settings.Development (development)
@@ -32,6 +32,7 @@ data App = App
     , httpManager :: Manager
     , persistConfig :: Settings.PersistConf
     , appLogger :: Logger
+    , monitorThread :: ThreadId
     }
 
 instance HasHttpManager App where

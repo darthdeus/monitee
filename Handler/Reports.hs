@@ -1,6 +1,5 @@
 module Handler.Reports where
 
-import Debug.Trace
 import Database.Persist.Sql
 import Import
 import Helpers

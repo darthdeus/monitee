@@ -10,21 +10,19 @@ import Import
 import Network.Wreq as Wreq
 import Database.Persist.Postgresql
 
-runMonitor :: App -> IO ()
-runMonitor app = do
-    let pool = connPool app
-
+runMonitor :: PersistConfigPool PersistConf -> IO ()
+runMonitor pool = do
     let loop = do
         flip runSqlPersistMPool pool $ do
             processes <- selectList [] [Desc ProcessName]
             mapM_ checkAvailability processes
             return ()
 
-        threadDelay 100000000
-        putStrLn "looping"
+        threadDelay 1000000
+        putStrLn "looping 2"
         loop
 
-    void loop
+    loop
 
 checkAvailability :: Entity Process -> SqlPersistM ()
 checkAvailability (Entity pid p) = do

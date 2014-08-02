@@ -1,7 +1,7 @@
 module Handler.Processes where
 
 import Data.Aeson
-import Data.Time
+-- import Data.Time
 import Database.Persist.Sql
 import Import
 import Prelude (head)
@@ -38,13 +38,13 @@ getProcessR processId = do
 
     reports <- runDB $ selectList [ReportProcess ==. processId] [Desc ReportTime, LimitTo 10000]
 
-    let availability = neco reports
+    --let availability = neco reports
 
     defaultLayout $(widgetFile "process")
 
-neco :: [Entity Report] -> [(UTCTime, Bool)]
-neco entities = map (\report -> (report ^. reportTime, report ^. reportStatus)) reports
-    where reports = map entityVal entities
+-- neco :: [Entity Report] -> [(UTCTime, Bool)]
+-- neco entities = map (\report -> (report ^. reportTime, report ^. reportStatus)) reports
+--     where reports = map entityVal entities
 
 postProcessR :: ProcessId -> Handler Html
 postProcessR processId = do
